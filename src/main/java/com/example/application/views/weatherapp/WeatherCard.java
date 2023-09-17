@@ -1,6 +1,10 @@
 package com.example.application.views.weatherapp;
 
 import java.awt.Color;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import com.example.application.MyIconsFeather;
 import com.example.application.views.MainLayout;
@@ -43,8 +47,20 @@ import com.vaadin.flow.router.Route;
 public class WeatherCard extends Main{
 
     private OrderedList imageList;
+    private WeatherData weatherData;
 
     public WeatherCard(){
+        LoadUI("Cebu");
+    }
+
+    private void LoadUI(String location){
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy");
+        String formattedDate = currentDate.format(dateFormatter);
+
+        WeatherProxy weatherProxy = new WeatherProxy(location);
+        weatherData = weatherProxy.getWeatherData();
+    
         UI.getCurrent().getPage().addJsModule("https://unpkg.com/feather-icons");
 
         addClassNames(Display.FLEX, FlexDirection.COLUMN, AlignItems.CENTER, Margin.LARGE);
@@ -71,17 +87,20 @@ public class WeatherCard extends Main{
                 Div dateContainer = new Div();
                 dateContainer.addClassName("date-container");
 
-                    H2 dateDayName = new H2("Tuesday");
+                    H2 dateDayName = new H2(currentDate.getDayOfWeek().toString());
                     dateDayName.addClassName("date-dayname");
 
-                    Span dateDay = new Span("15 Jan 2019");
+                    Span dateDay = new Span(formattedDate);
                     dateDay.addClassName("date-day");
 
                     Icon locationIcon = MyIconsFeather.MAP_PIN.create();
                     locationIcon.setSize("15px");
                     locationIcon.addClassName("location-icon");
 
-                    Span locationSpan = new Span("Toledo, Cebu");
+                    String locationName = weatherData.getLocation().getName();
+                    String countryName = weatherData.getLocation().getCountry(); 
+                    String locDisplay = locationName + ", " + countryName;
+                    Span locationSpan = new Span(locDisplay);
                     locationSpan.addClassName("location");
 
                 dateContainer.add(dateDayName, dateDay, locationIcon, locationSpan);
@@ -93,10 +112,10 @@ public class WeatherCard extends Main{
                     weatherIcon.setSize("60px");
                     weatherIcon.addClassName("weather-icon");
 
-                    H1 weatherTemp = new H1("29°C");
+                    H1 weatherTemp = new H1(String.valueOf((int)Math.round(weatherData.getCurrent().getTemperatureCelsius())) + "°C");
                     weatherTemp.addClassName("weather-temp");
 
-                    H3 weatherDesc = new H3("Sunny");
+                    H3 weatherDesc = new H3(weatherData.getCurrent().getCondition().getText());
                     weatherDesc.addClassName("weather-desc");
 
                 weatherContainer.add(weatherIcon, weatherTemp, weatherDesc);
@@ -157,6 +176,4 @@ public class WeatherCard extends Main{
         container.add(weatherSide, infoSide);
         add(container);
     }
-
-
 }

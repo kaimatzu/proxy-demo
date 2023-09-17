@@ -76,4 +76,8 @@ public class WeatherService {
             return "Condition data not available";
         }
     }
+
+    public WeatherData getWeatherData() {
+        return this.weatherData;
+    }
 }
