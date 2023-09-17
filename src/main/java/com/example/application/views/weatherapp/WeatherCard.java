@@ -16,6 +16,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.UnorderedList;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
@@ -102,7 +103,60 @@ public class WeatherCard extends Main{
 
             weatherSide.add(image, weatherGradient, dateContainer, weatherContainer);
             
-        container.add(weatherSide);
+            Div infoSide = new Div();
+            infoSide.addClassName("info-side");
+
+                Div todayInfoContainer = new Div();
+                todayInfoContainer.addClassName("today-info-container");
+
+                    Div todayInfo = new Div();
+                    todayInfo.addClassName("today-info");
+
+                        Div precipitation = new Div();
+                        precipitation.addClassName("precipitation");
+
+                            Span precipitationTitle = new Span("PRECIPITATION");
+                            precipitationTitle.addClassName("title");
+
+                            Span precipitationValue = new Span("0 %");
+                            precipitationValue.addClassName("value");
+
+                        precipitation.add(precipitationTitle, precipitationValue);
+
+                        Div humidity = new Div();
+                        humidity.addClassName("humidity");
+
+                            Span humidityTitle = new Span("HUMIDITY");
+                            humidityTitle.addClassName("title");
+
+                            Span humidityValue = new Span("0 %");
+                            humidityValue.addClassName("value");
+
+                        humidity.add(humidityTitle, humidityValue);    
+
+                        Div wind = new Div();
+                        wind.addClassName("wind");
+
+                            Span windTitle = new Span("WIND");
+                            windTitle.addClassName("title");
+
+                            Span windValue = new Span("0 km/h");
+                            windValue.addClassName("value");
+
+                        wind.add(windTitle, windValue);   
+                    
+                    todayInfo.add(precipitation, humidity, wind);
+
+                Div weekContainer = new Div();
+                weekContainer.addClassName("week-container");
+
+                    UnorderedList weekList = new UnorderedList();
+
+            infoSide.add(todayInfo);
+
+        container.add(weatherSide, infoSide);
         add(container);
     }
+
+
 }
