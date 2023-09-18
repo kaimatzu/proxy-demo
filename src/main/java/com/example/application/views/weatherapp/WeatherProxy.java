@@ -5,23 +5,25 @@ import java.util.Map;
 
 class WeatherProxy {
     private WeatherService weatherService;
-    private Map<String, WeatherData> cache;
+    private Map<String, WeatherData> cacheData;
+    private Map<String, WeatherForecast> cacheForecast;
     private String location;
 
     public WeatherProxy(String location) {
         this.weatherService = new WeatherService("81caee637d1843918aa43838231609", location);
         this.location = location;
-        this.cache = new HashMap<>();
+        this.cacheData = new HashMap<>();
+        this.cacheForecast = new HashMap<>();
     }
 
-    public WeatherData getWeatherData(){
+    public WeatherData getWeatherData() {
         // Check if weather data for the location is cached locally
         // If not, fetch it from the remote WeatherService
-        if (!isCached(this.location)) {
+        if (!isCachedWeatherData(this.location)) {
             cacheWeatherData(this.location);
         }
 
-        return getCachedData(this.location);
+        return getCachedWeatherData(this.location);
     }
 
     public WeatherData getWeatherData(String location) {
@@ -31,32 +33,74 @@ class WeatherProxy {
         }
         // Check if weather data for the location is cached locally
         // If not, fetch it from the remote WeatherService
-        if (!isCached(location)) {
+        if (!isCachedWeatherData(location)) {
             cacheWeatherData(location);
         }
 
-        return getCachedData(location);
+        return getCachedWeatherData(location);
     }
 
-    private boolean isCached(String location) {
+    public WeatherForecast getWeatherForecast() {
+        // Check if weather data for the location is cached locally
+        // If not, fetch it from the remote WeatherService
+        if (!isCachedWeatherForecast(this.location)) {
+            cacheWeatherForecast(this.location);
+        }
+
+        return getCachedWeatherForecast(this.location);
+    }
+
+    public WeatherForecast getWeatherForecast(String location) {
+        // Change the location if a new one is provided
+        if (!location.equals(this.location)) {
+            this.location = location;
+        }
+        // Check if weather data for the location is cached locally
+        // If not, fetch it from the remote WeatherService
+        if (!isCachedWeatherForecast(location)) {
+            cacheWeatherForecast(location);
+        }
+
+        return getCachedWeatherForecast(location);
+    }
+
+    private boolean isCachedWeatherData(String location) {
         // Check if weather data for the location is cached
-        return cache.containsKey(location);
+        return cacheData.containsKey(location);
+    }
+
+    private boolean isCachedWeatherForecast(String location) {
+        // Check if weather data for the location is cached
+        return cacheForecast.containsKey(location);
     }
 
     private void cacheWeatherData(String location) {
         // Fetch weather data from the remote service and cache it
         WeatherData weatherData = weatherService.getWeatherData();
         
-        cache.put(location, weatherData);
+        cacheData.put(location, weatherData);
     }
 
-    private WeatherData getCachedData(String location) {
+    private void cacheWeatherForecast(String location) {
+        // Fetch weather data from the remote service and cache it
+        WeatherForecast weatherForecast = weatherService.getWeatherForecast();
+        
+        cacheForecast.put(location, weatherForecast);
+    }
+
+    private WeatherData getCachedWeatherData(String location) {
         // Retrieve weather data from the cache
-        return cache.get(location);
+        return cacheData.get(location);
+    }
+
+    private WeatherForecast getCachedWeatherForecast(String location) {
+        // Retrieve weather data from the cache
+        return cacheForecast.get(location);
     }
 
     public void clearCache() {
         // Clear the cache if needed
-        cache.clear();
+        cacheData.clear();
+        cacheForecast.clear();
     }
 }

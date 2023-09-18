@@ -15,7 +15,7 @@ public class WeatherData {
     public Current getCurrent() {
         return current;
     }
-    
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Location {
         private String name;
@@ -43,7 +43,7 @@ public class WeatherData {
         public double getLat() {
             return lat;
         }
-    
+
         @JsonProperty("lon")
         public double getLon() {
             return lon;
@@ -52,10 +52,9 @@ public class WeatherData {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Current {
-        @JsonProperty("temp_c")
         private double temperatureCelsius;
         private Condition condition;
-
+        // private 
         @JsonProperty("temp_c")
         public double getTemperatureCelsius() {
             return temperatureCelsius;

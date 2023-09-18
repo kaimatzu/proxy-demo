@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import com.example.application.MyIconsFeather;
 import com.example.application.views.MainLayout;
+import com.example.application.views.weatherapp.WeatherForecast.ForecastDay;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.UI;
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
@@ -45,22 +47,23 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Weather App")
 @Route(value = "weather", layout = MainLayout.class)
 public class WeatherCard extends Main{
-
     private OrderedList imageList;
     private WeatherData weatherData;
+    private WeatherForecast weatherForecast;
 
     public WeatherCard(){
-        LoadUI("Cebu");
+        WeatherProxy weatherProxy = new WeatherProxy("Cebu");
+        weatherData = weatherProxy.getWeatherData();
+        weatherForecast = weatherProxy.getWeatherForecast();
+
+        LoadUI();
     }
 
-    private void LoadUI(String location){
+    private void LoadUI(){
         LocalDate currentDate = LocalDate.now();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy");
         String formattedDate = currentDate.format(dateFormatter);
 
-        WeatherProxy weatherProxy = new WeatherProxy(location);
-        weatherData = weatherProxy.getWeatherData();
-    
         UI.getCurrent().getPage().addJsModule("https://unpkg.com/feather-icons");
 
         addClassNames(Display.FLEX, FlexDirection.COLUMN, AlignItems.CENTER, Margin.LARGE);
@@ -70,7 +73,7 @@ public class WeatherCard extends Main{
         container.addClassNames(Display.FLEX, AlignItems.START, JustifyContent.START,
                 Margin.Bottom.MEDIUM, Overflow.HIDDEN, BorderRadius.LARGE, Width.FULL);
         container.setHeight("400px");
-        container.setWidth("600px");
+        container.setWidth("675px");
 
             Div weatherSide = new Div();
             weatherSide.addClassName("weather-side");
@@ -137,7 +140,7 @@ public class WeatherCard extends Main{
                             Span precipitationTitle = new Span("PRECIPITATION");
                             precipitationTitle.addClassName("title");
 
-                            Span precipitationValue = new Span("0 %");
+                            Span precipitationValue = new Span(weatherForecast.getForecast().getForecastday().get(0).getDay().getPrecipitation() + "%");
                             precipitationValue.addClassName("value");
 
                         precipitation.add(precipitationTitle, precipitationValue);
@@ -148,7 +151,7 @@ public class WeatherCard extends Main{
                             Span humidityTitle = new Span("HUMIDITY");
                             humidityTitle.addClassName("title");
 
-                            Span humidityValue = new Span("0 %");
+                            Span humidityValue = new Span((int)weatherForecast.getForecast().getForecastday().get(0).getDay().getAvgHumidity() + "%");
                             humidityValue.addClassName("value");
 
                         humidity.add(humidityTitle, humidityValue);    
@@ -169,11 +172,40 @@ public class WeatherCard extends Main{
                 Div weekContainer = new Div();
                 weekContainer.addClassName("week-container");
 
-                    UnorderedList weekList = new UnorderedList();
+                    Span forecast = new Span("Forecast");
+                    forecast.addClassName("title");
 
-            infoSide.add(todayInfo);
+                    UnorderedList weekList = weekList();
+
+                weekContainer.add(forecast, weekList);
+
+            infoSide.add(todayInfo, weekContainer);
 
         container.add(weatherSide, infoSide);
         add(container);
+    }
+
+    private UnorderedList weekList(){
+        LocalDate currentDate = LocalDate.now();
+        int daysOffset = 0;
+        UnorderedList weekList = new UnorderedList();
+        for (ForecastDay forecastDay : weatherForecast.getForecast().getForecastday()) {
+            ListItem listItem = new ListItem();
+
+            Icon dayIcon = MyIconsFeather.SUN.create();
+            dayIcon.addClassName("day-icon");
+
+            Span dayName = new Span(currentDate.plusDays(daysOffset++).getDayOfWeek().toString().substring(0, 3));
+            dayName.addClassName("day-name");
+
+            Span dayTemp = new Span((int)Math.round(forecastDay.getDay().getAvgtempC()) + "°C");
+            dayTemp.addClassName("day-temp");
+
+            listItem.add(dayIcon, dayName, dayTemp);
+
+            weekList.add(listItem);
+            weekList.addClassName("week-list");
+        }
+        return weekList;
     }
 }
