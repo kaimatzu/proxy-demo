@@ -7,6 +7,8 @@ import java.net.URL;
 
 import org.apache.commons.lang3.ObjectUtils.Null;
 
+import java.lang.reflect.Field;
+
 import com.example.application.views.weatherapp.WeatherData.Location;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,7 +26,7 @@ public class WeatherService {
     private WeatherData fetchData() {
         try {
             // Create the URL for the API request
-            String apiUrl = "http://api.weatherapi.com/v1/current.json?key=" + apiKey + "&q=" + location + "&aqi=no";
+            String apiUrl = "http://api.weatherapi.com/v1/forecast.json?key=" + apiKey + "&q=" + location + "&days=4&aqi=no&alerts=no";
 
             // Open a connection to the URL
             HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
@@ -45,7 +47,23 @@ public class WeatherService {
             // Parse the JSON response using Jackson
             ObjectMapper objectMapper = new ObjectMapper();
             WeatherData weatherData = objectMapper.readValue(responseBuilder.toString(), WeatherData.class);
-                 
+            WeatherForecastList weatherForecastList = objectMapper.readValue(responseBuilder.toString(), WeatherForecastList.class);
+            
+            // Get the class object for MyClass
+            Class<?> cls1 = weatherData.getClass();
+            printPropertiesAndValues(weatherData, cls1);
+            System.out.print("________________________________________\n");
+            // for(WeatherForecastData forecast : weatherForecastList.getData()){
+            //     printPropertiesAndValues(forecast, forecast.getClass());
+            // }
+            Class<?> cls2 = weatherForecastList.getClass();
+            printPropertiesAndValues(weatherForecastList, cls2);
+            for(ForecastDay forecastDay : weatherForecastList.getForecast().getForecastday()){
+                System.out.print(forecastDay.getDate() + " | " + forecastDay.getDay().getAvgtempC() +  " | " + forecastDay.getDay().getCondition().getText() + "\n");
+            }
+
+            System.out.print("________________________________________");
+
             return weatherData;
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,5 +97,30 @@ public class WeatherService {
 
     public WeatherData getWeatherData() {
         return this.weatherData;
+    }
+
+    private static void printPropertiesAndValues(Object obj, Class<?> cls) {
+        Field[] fields = cls.getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            try {
+                Object value = field.get(obj);
+
+                if (value != null) {
+                    if (field.getType().isPrimitive() || field.getType().equals(String.class)) {
+                        // Print primitive types or strings
+                        System.out.println("Property name: " + fieldName + ", Value: " + value);
+                    } else {
+                        // If the property is an object, recursively print its properties
+                        System.out.println("Property name: " + fieldName);
+                        printPropertiesAndValues(value, field.getType());
+                    }
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

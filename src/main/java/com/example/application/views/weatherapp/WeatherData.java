@@ -3,6 +3,7 @@ package com.example.application.views.weatherapp;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherData {
     private Location location;
     private Current current;
@@ -11,16 +12,8 @@ public class WeatherData {
         return location;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
     public Current getCurrent() {
         return current;
-    }
-
-    public void setCurrent(Current current) {
-        this.current = current;
     }
     
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -36,17 +29,9 @@ public class WeatherData {
             return name;
         }
 
-        public void setName(String name) {
-            this.name = name;
-        }
-
         @JsonProperty("region")
         public String getRegion() {
             return region;
-        }
-
-        public void setRegion(String region) {
-            this.region = region;
         }
 
         @JsonProperty("country")
@@ -54,17 +39,9 @@ public class WeatherData {
             return country;
         }
 
-        public void setCountry(String country) {
-            this.country = country;
-        }
-
         @JsonProperty("lat")
         public double getLat() {
             return lat;
-        }
-    
-        public void setLat(double lat) {
-            this.lat = lat;
         }
     
         @JsonProperty("lon")
@@ -84,17 +61,9 @@ public class WeatherData {
             return temperatureCelsius;
         }
 
-        public void setTemperatureCelsius(double temperatureCelsius) {
-            this.temperatureCelsius = temperatureCelsius;
-        }
-
         @JsonProperty("condition")
         public Condition getCondition() {
             return condition;
-        }
-
-        public void setCondition(Condition condition) {
-            this.condition = condition;
         }
     }
 
@@ -104,10 +73,6 @@ public class WeatherData {
 
         public String getText() {
             return text;
-        }
-
-        public void setText(String text) {
-            this.text = text;
         }
     }
 }
