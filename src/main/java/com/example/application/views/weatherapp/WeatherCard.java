@@ -229,6 +229,7 @@ public class WeatherCard extends Main{
             infoSide.add(todayInfo, weekContainer);
 
         container.add(weatherSide, infoSide);
+        
         add(container);
     }
 
