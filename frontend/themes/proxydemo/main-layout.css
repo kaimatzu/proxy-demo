@@ -14,3 +14,4 @@ vaadin-scroller[slot="drawer"] {
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
+

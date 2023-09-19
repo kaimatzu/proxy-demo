@@ -43,8 +43,9 @@ public class WeatherForecast {
         private double avgtempC;
         private int precipitation;
         private double avgHumidity;
+        private double maxWindKph;
         private Condition condition;
-        
+
         @JsonProperty("avgtemp_c")
         public double getAvgtempC() {
             return avgtempC;
@@ -60,6 +61,11 @@ public class WeatherForecast {
             return this.avgHumidity;
         }
 
+        @JsonProperty("maxwind_kph")
+        public double getMaxWindKph() {
+            return this.maxWindKph;
+        }
+
         @JsonProperty("condition")
         public Condition getCondition() {
             return condition;
@@ -69,9 +75,16 @@ public class WeatherForecast {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Condition {
         private String text;
+        private int code;
 
+        @JsonProperty("text")
         public String getText() {
             return text;
+        }
+
+        @JsonProperty("code")
+        public int getCode() {
+            return code;
         }
     }
 }

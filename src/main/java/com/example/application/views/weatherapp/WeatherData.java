@@ -69,9 +69,16 @@ public class WeatherData {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Condition {
         private String text;
+        private int code;
 
+        @JsonProperty("text")
         public String getText() {
             return text;
+        }
+
+        @JsonProperty("code")
+        public int getCode() {
+            return code;
         }
     }
 }

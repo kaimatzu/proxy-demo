@@ -4,10 +4,15 @@ import java.awt.Color;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import com.example.application.MyIconsFeather;
 import com.example.application.views.MainLayout;
+import com.example.application.views.weatherapp.WeatherData.Condition;
 import com.example.application.views.weatherapp.WeatherForecast.ForecastDay;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
@@ -25,6 +30,9 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
 import com.vaadin.flow.theme.lumo.LumoUtility.BorderRadius;
@@ -41,6 +49,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.Position;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
+import com.vaadin.flow.theme.material.Material;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -50,8 +59,23 @@ public class WeatherCard extends Main{
     private OrderedList imageList;
     private WeatherData weatherData;
     private WeatherForecast weatherForecast;
+    HashMap<String, List<Integer>> weatherCategoryMap;
+
+    //Changeable components
+    Span precipitationValue;
+    Span humidityValue;
+    Span windValue;
 
     public WeatherCard(){
+        weatherCategoryMap = new HashMap<>();
+
+        weatherCategoryMap.put("Sunny", Arrays.asList(1000));
+        weatherCategoryMap.put("Cloudy", Arrays.asList(1003, 1006, 1009));
+        weatherCategoryMap.put("Drizzle", Arrays.asList(1150, 1153, 1063, 1168, 1171));
+        weatherCategoryMap.put("Rain", Arrays.asList(1180, 1183, 1186, 1189, 1192, 1195));
+        weatherCategoryMap.put("Thunder", Arrays.asList(1087, 1273, 1276));
+        weatherCategoryMap.put("Snow", Arrays.asList(1066, 1069, 1072, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225, 1255, 1258, 1282));
+
         WeatherProxy weatherProxy = new WeatherProxy("Cebu");
         weatherData = weatherProxy.getWeatherData();
         weatherForecast = weatherProxy.getWeatherForecast();
@@ -114,7 +138,9 @@ public class WeatherCard extends Main{
                     Icon weatherIcon = MyIconsFeather.SUN.create();
                     weatherIcon.setSize("60px");
                     weatherIcon.addClassName("weather-icon");
-
+                    String weather = findWeatherCategory(weatherCategoryMap, weatherData.getCurrent().getCondition().getCode());
+                    System.out.println(weather + " - " + weatherData.getCurrent().getCondition().getCode());
+                    
                     H1 weatherTemp = new H1(String.valueOf((int)Math.round(weatherData.getCurrent().getTemperatureCelsius())) + "°C");
                     weatherTemp.addClassName("weather-temp");
 
@@ -140,7 +166,7 @@ public class WeatherCard extends Main{
                             Span precipitationTitle = new Span("PRECIPITATION");
                             precipitationTitle.addClassName("title");
 
-                            Span precipitationValue = new Span(weatherForecast.getForecast().getForecastday().get(0).getDay().getPrecipitation() + "%");
+                            precipitationValue = new Span(weatherForecast.getForecast().getForecastday().get(0).getDay().getPrecipitation() + "%");
                             precipitationValue.addClassName("value");
 
                         precipitation.add(precipitationTitle, precipitationValue);
@@ -151,7 +177,7 @@ public class WeatherCard extends Main{
                             Span humidityTitle = new Span("HUMIDITY");
                             humidityTitle.addClassName("title");
 
-                            Span humidityValue = new Span((int)weatherForecast.getForecast().getForecastday().get(0).getDay().getAvgHumidity() + "%");
+                            humidityValue = new Span((int)weatherForecast.getForecast().getForecastday().get(0).getDay().getAvgHumidity() + "%");
                             humidityValue.addClassName("value");
 
                         humidity.add(humidityTitle, humidityValue);    
@@ -162,7 +188,7 @@ public class WeatherCard extends Main{
                             Span windTitle = new Span("WIND");
                             windTitle.addClassName("title");
 
-                            Span windValue = new Span("0 km/h");
+                            windValue = new Span(weatherForecast.getForecast().getForecastday().get(0).getDay().getMaxWindKph() + " km/h");
                             windValue.addClassName("value");
 
                         wind.add(windTitle, windValue);   
@@ -191,9 +217,12 @@ public class WeatherCard extends Main{
         UnorderedList weekList = new UnorderedList();
         for (ForecastDay forecastDay : weatherForecast.getForecast().getForecastday()) {
             ListItem listItem = new ListItem();
+            if(daysOffset == 0) listItem.addClassName("active");
 
             Icon dayIcon = MyIconsFeather.SUN.create();
             dayIcon.addClassName("day-icon");
+            String weather = findWeatherCategory(weatherCategoryMap, weatherForecast.getForecast().getForecastday().get(0).getDay().getCondition().getCode());
+            System.out.println(weather + " - " + weatherForecast.getForecast().getForecastday().get(0).getDay().getCondition().getCode());
 
             Span dayName = new Span(currentDate.plusDays(daysOffset++).getDayOfWeek().toString().substring(0, 3));
             dayName.addClassName("day-name");
@@ -202,10 +231,46 @@ public class WeatherCard extends Main{
             dayTemp.addClassName("day-temp");
 
             listItem.add(dayIcon, dayName, dayTemp);
-
+            listItem.setId(String.valueOf(daysOffset - 1));
+            listItem.addClickListener(clickEvent -> {
+                modifyWeekList(weekList, listItem.getId().get(), precipitationValue, humidityValue, windValue);
+                listItem.addClassName("active"); 
+            });
+            
+            
             weekList.add(listItem);
             weekList.addClassName("week-list");
         }
         return weekList;
+    }
+
+    private void modifyWeekList(UnorderedList weekList, String id, Span precipitationValue, Span humidityValue, Span windValue) {
+        List<ListItem> listItems = weekList.getChildren()
+            .filter(component -> component instanceof ListItem)
+            .map(component -> (ListItem) component)
+            .collect(Collectors.toList());
+
+        for (ListItem listItem : listItems){
+            listItem.removeClassName("active");
+            precipitationValue.setText(weatherForecast.getForecast().getForecastday().get(Integer.parseInt(id)).getDay().getPrecipitation() + "%");
+            humidityValue.setText((int)weatherForecast.getForecast().getForecastday().get(Integer.parseInt(id)).getDay().getAvgHumidity() + "%");
+            windValue.setText(weatherForecast.getForecast().getForecastday().get(Integer.parseInt(id)).getDay().getMaxWindKph() + " km/h");
+        }
+    }   
+
+    private Icon setIcon(Condition condition) {
+        
+        return new Icon();
+    }
+
+    private static String findWeatherCategory(HashMap<String, List<Integer>> weatherCategoryMap, int code) {
+        for (HashMap.Entry<String, List<Integer>> entry : weatherCategoryMap.entrySet()) {
+            String category = entry.getKey();
+            List<Integer> codes = entry.getValue();
+            if (codes.contains(code)) {
+                return category;
+            }
+        }
+        return "Category not found";
     }
 }
