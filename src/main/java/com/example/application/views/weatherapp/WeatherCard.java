@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 import com.example.application.MyIconsFeather;
 import com.example.application.views.MainLayout;
@@ -60,6 +61,7 @@ public class WeatherCard extends Main{
     private WeatherData weatherData;
     private WeatherForecast weatherForecast;
     HashMap<String, List<Integer>> weatherCategoryMap;
+    HashMap<String, Supplier<Icon>> iconMap;
 
     //Changeable components
     Span precipitationValue;
@@ -70,11 +72,29 @@ public class WeatherCard extends Main{
         weatherCategoryMap = new HashMap<>();
 
         weatherCategoryMap.put("Sunny", Arrays.asList(1000));
-        weatherCategoryMap.put("Cloudy", Arrays.asList(1003, 1006, 1009));
-        weatherCategoryMap.put("Drizzle", Arrays.asList(1150, 1153, 1063, 1168, 1171));
-        weatherCategoryMap.put("Rain", Arrays.asList(1180, 1183, 1186, 1189, 1192, 1195));
-        weatherCategoryMap.put("Thunder", Arrays.asList(1087, 1273, 1276));
-        weatherCategoryMap.put("Snow", Arrays.asList(1066, 1069, 1072, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225, 1255, 1258, 1282));
+        weatherCategoryMap.put("Cloudy", Arrays.asList(1003, 1006, 1009, 1135, 1147));
+        weatherCategoryMap.put("Drizzle", Arrays.asList(1072, 1150, 1153, 1063, 1168, 1171));
+        weatherCategoryMap.put("Rain", Arrays.asList(1180, 1183, 1186, 1189, 1192, 1195, 1198, 1201, 1240, 1243, 1246, 1249, 1252, 1261, 1264));
+        weatherCategoryMap.put("Thunder", Arrays.asList(1087, 1273, 1276, 1282));
+        weatherCategoryMap.put("Snow", Arrays.asList(1066, 1069, 1114, 1117, 1204, 1207, 1210, 1213, 1216, 1219, 1222, 1225, 1237, 1255, 1258, 1282));
+
+        iconMap = new HashMap<>();
+
+        // Define suppliers for the icons
+        Supplier<Icon> sunnySupplier = MyIconsFeather.SUN::create;
+        Supplier<Icon> cloudySupplier = MyIconsFeather.CLOUD::create;
+        Supplier<Icon> drizzleSupplier = MyIconsFeather.CLOUD_DRIZZLE::create;
+        Supplier<Icon> rainSupplier = MyIconsFeather.CLOUD_RAIN::create;
+        Supplier<Icon> thunderSupplier = MyIconsFeather.CLOUD_LIGHTNING::create;
+        Supplier<Icon> snowSupplier = MyIconsFeather.CLOUD_SNOW::create;
+
+        // Store the suppliers in the map with their respective keys
+        iconMap.put("Sunny", sunnySupplier);
+        iconMap.put("Cloudy", cloudySupplier);
+        iconMap.put("Drizzle", drizzleSupplier);
+        iconMap.put("Rain", rainSupplier);
+        iconMap.put("Thunder", thunderSupplier);
+        iconMap.put("Snow", snowSupplier);
 
         WeatherProxy weatherProxy = new WeatherProxy("Cebu");
         weatherData = weatherProxy.getWeatherData();
@@ -135,7 +155,8 @@ public class WeatherCard extends Main{
                 Div weatherContainer = new Div();
                 weatherContainer.addClassName("weather-container");
 
-                    Icon weatherIcon = MyIconsFeather.SUN.create();
+                    Supplier<Icon> supplier = iconMap.get(findWeatherCategory(weatherCategoryMap, weatherData.getCurrent().getCondition().getCode()));
+                    Icon weatherIcon = supplier.get();
                     weatherIcon.setSize("60px");
                     weatherIcon.addClassName("weather-icon");
                     String weather = findWeatherCategory(weatherCategoryMap, weatherData.getCurrent().getCondition().getCode());
@@ -219,27 +240,26 @@ public class WeatherCard extends Main{
             ListItem listItem = new ListItem();
             if(daysOffset == 0) listItem.addClassName("active");
 
-            Icon dayIcon = MyIconsFeather.SUN.create();
+            Supplier<Icon> supplier = iconMap.get(findWeatherCategory(weatherCategoryMap, weatherForecast.getForecast().getForecastday().get(daysOffset).getDay().getCondition().getCode()));
+            Icon dayIcon = supplier.get();
             dayIcon.addClassName("day-icon");
-            String weather = findWeatherCategory(weatherCategoryMap, weatherForecast.getForecast().getForecastday().get(0).getDay().getCondition().getCode());
-            System.out.println(weather + " - " + weatherForecast.getForecast().getForecastday().get(0).getDay().getCondition().getCode());
 
-            Span dayName = new Span(currentDate.plusDays(daysOffset++).getDayOfWeek().toString().substring(0, 3));
+            Span dayName = new Span(currentDate.plusDays(daysOffset).getDayOfWeek().toString().substring(0, 3));
             dayName.addClassName("day-name");
 
             Span dayTemp = new Span((int)Math.round(forecastDay.getDay().getAvgtempC()) + "°C");
             dayTemp.addClassName("day-temp");
-
             listItem.add(dayIcon, dayName, dayTemp);
-            listItem.setId(String.valueOf(daysOffset - 1));
+            listItem.setId(String.valueOf(daysOffset));
             listItem.addClickListener(clickEvent -> {
                 modifyWeekList(weekList, listItem.getId().get(), precipitationValue, humidityValue, windValue);
                 listItem.addClassName("active"); 
             });
             
-            
             weekList.add(listItem);
             weekList.addClassName("week-list");
+
+            daysOffset++;
         }
         return weekList;
     }
@@ -257,11 +277,6 @@ public class WeatherCard extends Main{
             windValue.setText(weatherForecast.getForecast().getForecastday().get(Integer.parseInt(id)).getDay().getMaxWindKph() + " km/h");
         }
     }   
-
-    private Icon setIcon(Condition condition) {
-        
-        return new Icon();
-    }
 
     private static String findWeatherCategory(HashMap<String, List<Integer>> weatherCategoryMap, int code) {
         for (HashMap.Entry<String, List<Integer>> entry : weatherCategoryMap.entrySet()) {
