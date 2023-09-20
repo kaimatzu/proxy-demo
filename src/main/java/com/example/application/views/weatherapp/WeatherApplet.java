@@ -1,63 +1,48 @@
 package com.example.application.views.weatherapp;
 
-import java.awt.Color;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.function.Supplier;
 
 import com.example.application.MyIconsFeather;
 import com.example.application.views.MainLayout;
-import com.example.application.views.weatherapp.WeatherData.Condition;
 import com.example.application.views.weatherapp.WeatherForecast.ForecastDay;
-import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Main;
-import com.vaadin.flow.component.html.OrderedList;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.page.AppShellConfigurator;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.lumo.Lumo;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
 import com.vaadin.flow.theme.lumo.LumoUtility.BorderRadius;
-import com.vaadin.flow.theme.lumo.LumoUtility.BoxShadow;
 import com.vaadin.flow.theme.lumo.LumoUtility.Display;
 import com.vaadin.flow.theme.lumo.LumoUtility.FlexDirection;
-import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
-import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
 import com.vaadin.flow.theme.lumo.LumoUtility.JustifyContent;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.Overflow;
-import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.Position;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
-import com.vaadin.flow.theme.material.Material;
+
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 
-@PageTitle("Weather App")
+// import 
+@PageTitle("Weather Applet")
 @Route(value = "weather", layout = MainLayout.class)
-public class WeatherCard extends Main{
-    private OrderedList imageList;
+@RouteAlias(value = "", layout = MainLayout.class)
+public class WeatherApplet extends Main{
+    // private OrderedList imageList;
     private WeatherData weatherData;
     private WeatherForecast weatherForecast;
     HashMap<String, List<Integer>> weatherCategoryMap;
@@ -68,7 +53,7 @@ public class WeatherCard extends Main{
     Span humidityValue;
     Span windValue;
 
-    public WeatherCard(){
+    public WeatherApplet(){
         weatherCategoryMap = new HashMap<>();
 
         weatherCategoryMap.put("Sunny", Arrays.asList(1000));
@@ -77,7 +62,7 @@ public class WeatherCard extends Main{
         weatherCategoryMap.put("Rain", Arrays.asList(1180, 1183, 1186, 1189, 1192, 1195, 1198, 1201, 1240, 1243, 1246, 1249, 1252, 1261, 1264));
         weatherCategoryMap.put("Thunder", Arrays.asList(1087, 1273, 1276, 1282));
         weatherCategoryMap.put("Snow", Arrays.asList(1066, 1069, 1114, 1117, 1204, 1207, 1210, 1213, 1216, 1219, 1222, 1225, 1237, 1255, 1258, 1282));
-
+        
         iconMap = new HashMap<>();
 
         // Define suppliers for the icons
@@ -229,8 +214,10 @@ public class WeatherCard extends Main{
             infoSide.add(todayInfo, weekContainer);
 
         container.add(weatherSide, infoSide);
-        
-        add(container);
+
+        MarkdownPage mp = new MarkdownPage();
+
+        add(container, mp);
     }
 
     private UnorderedList weekList(){

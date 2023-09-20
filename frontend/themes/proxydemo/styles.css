@@ -1,6 +1,13 @@
 @import url('./main-layout.css');
 @import url('./views/about-view.css');
 @import url('./views/weather-card.css');
+@import url('./github-markdown.css');
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #0d1117;
+    }
+}
 
 [theme~="dark"] {
     --lumo-base-color: #343d4b;
