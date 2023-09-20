@@ -1,6 +1,11 @@
 # Proxy Demo
 
-Proxy Design Pattern demonstration. Uses Spring Boot and Vaadin for frameworks.
+Proxy Design Pattern demonstration. Uses [Spring Boot](https://spring.io/projects/spring-boot) and [Vaadin](https://vaadin.com/docs) for frameworks.
+
+## Prerequisites
+
+* [Java 17+](https://www.java.com)
+* [Node](https://nodejs.org)
 
 ## Running the application
 
@@ -23,16 +28,3 @@ Maven project. Read more on [how to import Vaadin projects to different IDEs](ht
 - `views` package in `src/main/java` contains the server-side Java views of your application.
 - `views` folder in `frontend/` contains the client-side JavaScript views of your application.
 - `themes` folder in `frontend/` contains the custom CSS styles.
-
-## Useful links
-
-- Read the documentation at [vaadin.com/docs](https://vaadin.com/docs).
-- Follow the tutorial at [vaadin.com/docs/latest/tutorial/overview](https://vaadin.com/docs/latest/tutorial/overview).
-- Create new projects at [start.vaadin.com](https://start.vaadin.com/).
-- Search UI components and their usage examples at [vaadin.com/docs/latest/components](https://vaadin.com/docs/latest/components).
-- View use case applications that demonstrate Vaadin capabilities at [vaadin.com/examples-and-demos](https://vaadin.com/examples-and-demos).
-- Build any UI without custom CSS by discovering Vaadin's set of [CSS utility classes](https://vaadin.com/docs/styling/lumo/utility-classes). 
-- Find a collection of solutions to common use cases at [cookbook.vaadin.com](https://cookbook.vaadin.com/).
-- Find add-ons at [vaadin.com/directory](https://vaadin.com/directory).
-- Ask questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/vaadin) or join our [Discord channel](https://discord.gg/MYFq5RTbBn).
-- Report issues, create pull requests in [GitHub](https://github.com/vaadin).

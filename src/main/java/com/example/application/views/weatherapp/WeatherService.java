@@ -5,11 +5,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.apache.commons.lang3.ObjectUtils.Null;
-
 import java.lang.reflect.Field;
 
-import com.example.application.views.weatherapp.WeatherData.Location;
 import com.example.application.views.weatherapp.WeatherForecast.ForecastDay;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
